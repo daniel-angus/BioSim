@@ -27,4 +27,7 @@
 
     int grid_height(const Grid *grid);
 
+    Grid *grid_copy(const Grid *grid);
+
+
 #endif /* GRID_H */

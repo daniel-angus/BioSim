@@ -183,4 +183,3 @@ Grid *grid_copy(const Grid *grid) {
 
     return new_grid;
 }
-
