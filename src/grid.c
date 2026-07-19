@@ -1,5 +1,8 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
 #include "grid.h"
 
 struct Grid {
