@@ -4,15 +4,14 @@
 #include <string.h>
 
 #include "grid.h"
-
 struct Grid {
     int width;
     int height;
+
     int *cells;
 };
 
-Grid *grid_create(int width, int height)
-{
+Grid *grid_create(int width, int height) {
     if (width <= 0 || height <= 0) {
         return NULL;
     }
@@ -41,7 +40,6 @@ Grid *grid_create(int width, int height)
 }
 
 void grid_destroy(Grid *grid) {
-
     if (grid == NULL) {
         return;
     }
@@ -63,7 +61,6 @@ static size_t grid_index(const Grid *grid, int x, int y) {
 }
 
 int grid_set(Grid *grid, int x, int y, int value) {
-
     if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height) {
         return 0;
     }
@@ -72,19 +69,15 @@ int grid_set(Grid *grid, int x, int y, int value) {
     return 1;
 }
 
-int grid_get(const Grid *grid, int x, int y, int *value) {
-
-    if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height || value == NULL) {
+int grid_get(const Grid *grid, int x, int y) {
+    if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height) {
         return 0;
     }
 
-    *value = grid->cells[grid_index(grid, x, y)];
     return 1;
 }
 
-
 int grid_fill(Grid *grid, int value) {
-
     if (grid == NULL) {
         return 0;
     }
@@ -103,7 +96,6 @@ int grid_clear(Grid *grid) {
 }   
 
 int grid_width(const Grid *grid) {
-    
     if (grid == NULL) {
         return -1; // Return -1 to indicate an error.
     }
@@ -111,15 +103,13 @@ int grid_width(const Grid *grid) {
 }
 
 int grid_height(const Grid *grid) {
-    
     if (grid == NULL) {
         return -1; // Return -1 to indicate an error.
     }
     return grid->height;
 }
 
-Grid *grid_copy(const Grid *grid)
-{
+Grid *grid_copy(const Grid *grid) {
     if (grid == NULL) {
         return NULL;
     }
@@ -138,8 +128,7 @@ Grid *grid_copy(const Grid *grid)
     return copy;
 }
 
-int grid_print(const Grid *grid)
-{
+int grid_print(const Grid *grid) {
     if (grid == NULL) {
         return 0;
     }
@@ -156,3 +145,40 @@ int grid_print(const Grid *grid)
 
     return 1;
 }
+
+/**
+ * @brief Counts the number of living neighbors for a given cell in the grid.
+ * 
+ * @param grid 
+ * @param x 
+ * @param y 
+ * @return The number of living neighbors (0-8) for the cell at (x, y).
+ */
+static int count_neighbours(const Grid *grid, int x, int y) {
+    int count = 0;
+
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <=1 ; dy++) {
+
+            if (dx==0 && dy ==0) {
+                continue;
+            }
+
+            int nx = x + dx;
+            int ny = y + dy;
+
+            if (nx < 0 || nx >= grid_width(grid) ||
+                ny < 0 || ny >= grid_height(grid)) {
+                continue;
+            }
+
+            if (grid_get(Grid, nx, ny) >= 1) {
+                if (!(dx==0 && dy ==0)) {
+                    count += 1;
+                }
+            }
+        }
+    }
+
+    return count;
+ }

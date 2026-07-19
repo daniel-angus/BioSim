@@ -46,7 +46,7 @@ int grid_set(Grid *grid, int x, int y, int value);
  * @param value A pointer to store the retrieved value.
  * @return 1 if the operation was successful, 0 otherwise.
  */
-int grid_get(const Grid *grid, int x, int y, int *value);
+int grid_get(const Grid *grid, int x, int y);
 
 /**
  * @brief Fills the entire grid with a specified value.
