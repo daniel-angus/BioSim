@@ -6,7 +6,7 @@ void renderer_delay(unsigned int milliseconds);
 
 int renderer_init(int width, int height, int cell_size);
 
-int renderer_should_close(void);
+int renderer_handle_events(Grid *grid);
 
 int renderer_draw(const Grid *grid);
 

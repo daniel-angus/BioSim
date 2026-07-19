@@ -38,13 +38,29 @@ int renderer_init(int width, int height, int requested_cell_size)
     return 1;
 }
 
-int renderer_should_close(void)
-{
+int renderer_handle_events(Grid *grid) {
+    if (grid == NULL) {
+        return 1;
+    }
+
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_EVENT_QUIT) {
             return 1;
+        }
+
+        if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
+            event.button.button == SDL_BUTTON_LEFT) {
+
+            int grid_x = (int)(event.button.x / cell_size);
+            int grid_y = (int)(event.button.y / cell_size);
+
+            int value;
+
+            if (grid_get(grid, grid_x, grid_y, &value)) {
+                grid_set(grid, grid_x, grid_y, !value);
+            }
         }
     }
 

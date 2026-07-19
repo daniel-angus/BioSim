@@ -81,13 +81,12 @@ int main(void)
         return 1;
     }
 
-    while (!renderer_should_close()) {
-        if (!renderer_draw(grid)) {
-            fprintf(stderr, "Rendering failed\n");
-            break;
-        }
+    while (!renderer_handle_events(grid)) {
+    if (!renderer_draw(grid)) {
+        break;
+    }
 
-        renderer_delay(16);
+    renderer_delay(16);
     }
 
     renderer_shutdown();
