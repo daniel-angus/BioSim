@@ -8,8 +8,7 @@ static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static int cell_size = 0;
 
-int renderer_init(int width, int height, int requested_cell_size)
-{
+int renderer_init(int width, int height, int requested_cell_size) {
     if (width <= 0 || height <= 0 || requested_cell_size <= 0) {
         return 0;
     }
@@ -67,13 +66,11 @@ int renderer_handle_events(Grid *grid) {
     return 0;
 }
 
-void renderer_delay(unsigned int milliseconds)
-{
+void renderer_delay(unsigned int milliseconds) {
     SDL_Delay(milliseconds);
 }
 
-int renderer_draw(const Grid *grid)
-{
+int renderer_draw(const Grid *grid) {
     if (grid == NULL || renderer == NULL) {
         return 0;
     }

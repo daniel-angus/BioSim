@@ -46,7 +46,7 @@ int grid_set(Grid *grid, int x, int y, int value);
  * @param value A pointer to store the retrieved value.
  * @return 1 if the operation was successful, 0 otherwise.
  */
-int grid_get(const Grid *grid, int x, int y);
+int grid_get(const Grid *grid, int x, int y, int *value);
 
 /**
  * @brief Fills the entire grid with a specified value.
@@ -96,5 +96,15 @@ Grid *grid_copy(const Grid *grid);
  * @return 1 if the operation was successful, 0 otherwise.
  */
 int grid_print(const Grid *grid);
+
+/**
+ * @brief Counts the number of adjacent (alive) neighbours to a cell, including diagonals.
+ * 
+ * @param grid 
+ * @param x 
+ * @param y 
+ * @return The number of adjacent alive neighbours to a cell.
+ */
+int grid_count_neighbours(const Grid *grid, int x, int y);
 
 #endif /* GRID_H */

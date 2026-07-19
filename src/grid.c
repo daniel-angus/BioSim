@@ -69,11 +69,17 @@ int grid_set(Grid *grid, int x, int y, int value) {
     return 1;
 }
 
-int grid_get(const Grid *grid, int x, int y) {
-    if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height) {
+int grid_get(const Grid *grid, int x, int y, int *value) {
+    if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height || value == NULL) {
         return 0;
     }
 
+    if (x < 0 || x >= grid->width ||
+        y < 0 || y >= grid->height) {
+        return 0;
+    }
+
+    *value = grid->cells[grid_index(grid, x, y)];
     return 1;
 }
 
@@ -154,7 +160,7 @@ int grid_print(const Grid *grid) {
  * @param y 
  * @return The number of living neighbors (0-8) for the cell at (x, y).
  */
-static int count_neighbours(const Grid *grid, int x, int y) {
+int grid_count_neighbours(const Grid *grid, int x, int y) {
     int count = 0;
 
     for (int dx = -1; dx <= 1; dx++) {
@@ -167,15 +173,10 @@ static int count_neighbours(const Grid *grid, int x, int y) {
             int nx = x + dx;
             int ny = y + dy;
 
-            if (nx < 0 || nx >= grid_width(grid) ||
-                ny < 0 || ny >= grid_height(grid)) {
-                continue;
-            }
+            int value;
 
-            if (grid_get(Grid, nx, ny) >= 1) {
-                if (!(dx==0 && dy ==0)) {
-                    count += 1;
-                }
+            if (grid_get(grid, nx, ny, &value) && value == 1) {
+                count++;
             }
         }
     }

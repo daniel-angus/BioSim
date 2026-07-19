@@ -48,8 +48,7 @@
 #include "grid.h"
 #include "renderer.h"
 
-int main(void)
-{
+int main(void) {
     const int grid_width_cells = 100;
     const int grid_height_cells = 100;
     const int cell_size = 8;
@@ -82,12 +81,14 @@ int main(void)
     }
 
     while (!renderer_handle_events(grid)) {
-    if (!renderer_draw(grid)) {
-        break;
+        if (!renderer_draw(grid)) {
+            break;
+        }
+
+        renderer_delay(16);
     }
 
-    renderer_delay(16);
-    }
+    printf("%d\n", grid_count_neighbours(grid, 1, 1));
 
     renderer_shutdown();
     grid_destroy(grid);
