@@ -71,6 +71,41 @@ int renderer_draw(const Grid *grid)
         return 0;
     }
 
+     /* Very faint grey grid lines. */
+    if (!SDL_SetRenderDrawColor(renderer, 225, 225, 225, 255)) {
+        return 0;
+    }
+
+    int width_pixels = grid_width(grid) * cell_size;
+    int height_pixels = grid_height(grid) * cell_size;
+
+    for (int x = 0; x <= grid_width(grid); ++x) {
+        float pixel_x = (float)(x * cell_size);
+
+        if (!SDL_RenderLine(
+                renderer,
+                pixel_x,
+                0.0f,
+                pixel_x,
+                (float)height_pixels)) {
+            return 0;
+        }
+    }
+
+    for (int y = 0; y <= grid_height(grid); ++y) {
+
+        float pixel_y = (float)(y * cell_size);
+
+        if (!SDL_RenderLine(
+                renderer,
+                0.0f,
+                pixel_y,
+                (float)width_pixels,
+                pixel_y)) {
+            return 0;
+        }
+    }
+
     /* Black rectangles: living cells. */
     if (!SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255)) {
         return 0;
@@ -105,8 +140,7 @@ int renderer_draw(const Grid *grid)
     return 1;
 }
 
-void renderer_shutdown(void)
-{
+void renderer_shutdown(void) {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 
