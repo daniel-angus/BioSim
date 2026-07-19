@@ -59,23 +59,6 @@ Run:
 ./biosim
 ```
 
-## Example
-
-```c
-#include "grid.h"
-
-int main(void)
-{
-    Grid *grid = grid_create(100, 100);
-
-    if (grid == NULL)
-        return 1;
-
-    grid_destroy(grid);
-    return 0;
-}
-```
-
 ## Contributing
 
 BioSim is currently under active development. Suggestions, bug reports, and contributions are welcome.
