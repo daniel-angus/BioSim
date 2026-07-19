@@ -4,8 +4,9 @@
 # C properties
 .vscode/
 
+# Build outputs
+bin/
+build/
+
 # Local notes
 instructions.txt
-
-# Compiled executables
-bin/
