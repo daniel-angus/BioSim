@@ -2,14 +2,7 @@
 
     #define GRID_H
 
-    typedef struct Grid {
-
-        int width;
-        int height;
-
-        int *cells;
-
-    } Grid;
+    typedef struct Grid Grid;
 
     /**
      * @brief Creates a new grid with the specified width and height.

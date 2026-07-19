@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include "grid.h"
 
+struct Grid {
+    int width;
+    int height;
+    int *cells;
+};
+
 Grid *grid_create(int width, int height) {
 
     if (width <= 0 || height <= 0) {
