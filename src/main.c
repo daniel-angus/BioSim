@@ -44,22 +44,53 @@
  */
 
 #include <stdio.h>
+
 #include "grid.h"
+#include "renderer.h"
 
-int main(void) {
+int main(void)
+{
+    const int grid_width_cells = 100;
+    const int grid_height_cells = 100;
+    const int cell_size = 8;
 
-    Grid *grid = grid_create(10, 10);
+    Grid *grid = grid_create(
+        grid_width_cells,
+        grid_height_cells
+    );
+
     if (grid == NULL) {
         fprintf(stderr, "Failed to create grid\n");
         return 1;
     }
 
-    printf("%d\n", grid_width(grid));
-    printf("%d\n", grid_height(grid));
+    /*
+     * A simple glider.
+     */
+    grid_set(grid, 51, 50, 1);
+    grid_set(grid, 52, 51, 1);
+    grid_set(grid, 50, 52, 1);
+    grid_set(grid, 51, 52, 1);
+    grid_set(grid, 52, 52, 1);
 
-    grid_fill(grid, 1);
-    grid_print(grid);
+    if (!renderer_init(
+            grid_width_cells * cell_size,
+            grid_height_cells * cell_size,
+            cell_size)) {
+        grid_destroy(grid);
+        return 1;
+    }
 
+    while (!renderer_should_close()) {
+        if (!renderer_draw(grid)) {
+            fprintf(stderr, "Rendering failed\n");
+            break;
+        }
+
+        renderer_delay(16);
+    }
+
+    renderer_shutdown();
     grid_destroy(grid);
 
     return 0;

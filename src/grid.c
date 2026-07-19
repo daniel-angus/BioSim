@@ -11,11 +11,17 @@ struct Grid {
     int *cells;
 };
 
-Grid *grid_create(int width, int height) {
-
+Grid *grid_create(int width, int height)
+{
     if (width <= 0 || height <= 0) {
         return NULL;
     }
+
+    if ((size_t)width > SIZE_MAX / (size_t)height) {
+        return NULL;
+    }
+
+    size_t cell_count = (size_t)width * (size_t)height;
 
     Grid *grid = calloc(1, sizeof *grid);
     if (grid == NULL) {
@@ -25,13 +31,9 @@ Grid *grid_create(int width, int height) {
     grid->width = width;
     grid->height = height;
 
-    if ((size_t)width > SIZE_MAX / (size_t)height) {
-        return NULL;
-    }
-    size_t cell_count = (size_t)width * (size_t)height;
     grid->cells = calloc(cell_count, sizeof *grid->cells);
     if (grid->cells == NULL) {
-        grid_destroy(grid); // Clean up partially constructed grid.
+        grid_destroy(grid);
         return NULL;
     }
 
