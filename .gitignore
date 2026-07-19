@@ -1,8 +1,11 @@
 # macOS
 .DS_Store
 
+# C properties
+.vscode/
+
 # Local notes
 instructions.txt
 
 # Compiled executable
-main
+biosim
