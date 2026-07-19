@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "grid.h"
 
 /**
@@ -182,4 +183,17 @@ Grid *grid_copy(const Grid *grid) {
     }
 
     return new_grid;
+}
+
+void grid_print(const Grid *grid) {
+    if (grid == NULL) {
+        return;
+    }
+
+    for (int y = 0; y < grid->height; ++y) {
+        for (int x = 0; x < grid->width; ++x) {
+            printf("%d ", grid->cells[grid_index(grid, x, y)]);
+        }
+        printf("\n");
+    }
 }

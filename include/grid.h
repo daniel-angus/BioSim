@@ -29,5 +29,7 @@
 
     Grid *grid_copy(const Grid *grid);
 
+    void grid_print(const Grid *grid);
+
 
 #endif /* GRID_H */

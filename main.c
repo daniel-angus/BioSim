@@ -57,6 +57,8 @@ int main(void) {
     printf("%d\n", grid->width);
     printf("%d\n", grid->height);
 
+    grid_fill(grid, 1);
+    grid_print(grid);
     grid_destroy(grid);
 
     return 0;
