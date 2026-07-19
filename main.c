@@ -59,6 +59,7 @@ int main(void) {
 
     grid_fill(grid, 1);
     grid_print(grid);
+
     grid_destroy(grid);
 
     return 0;

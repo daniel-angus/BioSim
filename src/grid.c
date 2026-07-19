@@ -2,15 +2,6 @@
 #include <stdio.h>
 #include "grid.h"
 
-/**
- * @brief Creates a new grid with the specified width and height.
- * 
- * @param width The width of the grid.
- * @param height The height of the grid.
- * 
- * @return A pointer to the newly created grid, or NULL if the
- *         dimensions are invalid or memory allocation fails.
- */
 Grid *grid_create(int width, int height) {
 
     if (width <= 0 || height <= 0) {
@@ -25,7 +16,11 @@ Grid *grid_create(int width, int height) {
     grid->width = width;
     grid->height = height;
 
-    grid->cells = calloc(width * height, sizeof *grid->cells);
+    if ((size_t)width > SIZE_MAX / (size_t)height) {
+        return NULL;
+    }
+    size_t cell_count = (size_t)width * (size_t)height;
+    grid->cells = calloc(cell_count, sizeof *grid->cells);
     if (grid->cells == NULL) {
         grid_destroy(grid); // Clean up partially constructed grid.
         return NULL;
@@ -34,11 +29,6 @@ Grid *grid_create(int width, int height) {
     return grid;
 }
 
-/**
- * @brief Frees all memory associated with the grid.
- * 
- * @param grid A pointer to the grid to be destroyed. May be NULL, in which case the function does nothing.
- */
 void grid_destroy(Grid *grid) {
 
     if (grid == NULL) {
@@ -61,15 +51,6 @@ static size_t grid_index(const Grid *grid, int x, int y) {
     return (size_t)y * grid->width + x;
 }
 
-/**
- * @brief Sets the value of a cell in the grid.
- * 
- * @param grid The grid containing the cell.
- * @param x The x-coordinate of the cell.
- * @param y The y-coordinate of the cell.
- * @param value The value to set.
- * @return 1 if the operation was successful, 0 otherwise.
- */
 int grid_set(Grid *grid, int x, int y, int value) {
 
     if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height) {
@@ -80,15 +61,6 @@ int grid_set(Grid *grid, int x, int y, int value) {
     return 1;
 }
 
-/**
- * @brief Gets the value of a cell in the grid.
- * 
- * @param grid The grid containing the cell.
- * @param x The x-coordinate of the cell.
- * @param y The y-coordinate of the cell.
- * @param value A pointer to store the retrieved value.
- * @return 1 if the operation was successful, 0 otherwise.
- */
 int grid_get(const Grid *grid, int x, int y, int *value) {
 
     if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height || value == NULL) {
@@ -99,13 +71,7 @@ int grid_get(const Grid *grid, int x, int y, int *value) {
     return 1;
 }
 
-/**
- * @brief Fills the entire grid with a specified value.
- * 
- * @param grid The grid to be filled.
- * @param value The value to fill the grid with.
- * @return 1 if the operation was successful, 0 otherwise.
- */
+
 int grid_fill(Grid *grid, int value) {
 
     if (grid == NULL) {
@@ -121,22 +87,10 @@ int grid_fill(Grid *grid, int value) {
     return 1;
 }
 
-/**
- * @brief Clears the grid by filling it with zeros.
- * 
- * @param grid The grid to be cleared.
- * @return 1 if the operation was successful, 0 otherwise.
- */
 int grid_clear(Grid *grid) {
     return grid_fill(grid, 0);
 }   
 
-/**
- * @brief Returns the width of the grid.   
- * 
- * @param grid The grid for which to return the width. 
- * @return The width of the grid, or -1 if the grid is NULL.
- */
 int grid_width(const Grid *grid) {
     
     if (grid == NULL) {
@@ -145,12 +99,6 @@ int grid_width(const Grid *grid) {
     return grid->width;
 }
 
-/**
- * @brief Returns the height of the grid.
- * 
- * @param grid The grid for which to return the height.
- * @return The height of the grid, or -1 if the grid is NULL.
- */
 int grid_height(const Grid *grid) {
     
     if (grid == NULL) {
@@ -159,41 +107,41 @@ int grid_height(const Grid *grid) {
     return grid->height;
 }
 
-/**
- * @brief Creates a copy of the given grid. 
- * 
- * @param grid The grid to be copied.
- * @return Grid* A pointer to the newly created copy of the grid, or NULL if the input grid is NULL or memory allocation fails. 
- */
-Grid *grid_copy(const Grid *grid) {
-    
+Grid *grid_copy(const Grid *grid)
+{
     if (grid == NULL) {
         return NULL;
     }
 
-    Grid *new_grid = grid_create(grid->width, grid->height);
-    if (new_grid == NULL) {
+    Grid *copy = grid_create(grid->width, grid->height);
+    if (copy == NULL) {
         return NULL;
     }
 
-    for (int y = 0; y < grid->height; ++y) {
-        for (int x = 0; x < grid->width; ++x) {
-            new_grid->cells[grid_index(new_grid, x, y)] = grid->cells[grid_index(grid, x, y)];
-        }
-    }
+    size_t cell_count = (size_t)grid->width * (size_t)grid->height;
 
-    return new_grid;
+    memcpy(copy->cells,
+           grid->cells,
+           cell_count * sizeof *grid->cells);
+
+    return copy;
 }
 
-void grid_print(const Grid *grid) {
+int grid_print(const Grid *grid)
+{
     if (grid == NULL) {
-        return;
+        return 0;
     }
 
     for (int y = 0; y < grid->height; ++y) {
         for (int x = 0; x < grid->width; ++x) {
-            printf("%d ", grid->cells[grid_index(grid, x, y)]);
+            printf("%d%s",
+                   grid->cells[grid_index(grid, x, y)],
+                   x == grid->width - 1 ? "" : " ");
         }
-        printf("\n");
+
+        putchar('\n');
     }
+
+    return 1;
 }
