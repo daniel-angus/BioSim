@@ -47,13 +47,17 @@ BioSim/
 Compile with GCC:
 
 ```bash
-gcc -Wall -Wextra -Wpedantic -std=c17 main.c grid.c -o main \
+gcc -Wall -Wextra -Werror -std=c99 \
+    main.c \
+    src/grid.c \
+    -Iinclude \
+    -o biosim\
 ```
 
 Run:
 
 ```bash
-./main
+./biosim
 ```
 
 ## Contributing
