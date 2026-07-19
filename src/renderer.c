@@ -61,6 +61,12 @@ int renderer_handle_events(Grid *grid) {
                 grid_set(grid, grid_x, grid_y, !value);
             }
         }
+
+        if (event.type == SDL_EVENT_KEY_DOWN &&
+            event.key.key == SDLK_SPACE &&
+            !event.key.repeat) {
+            grid_step(grid);
+        }
     }
 
     return 0;

@@ -90,6 +90,15 @@ int grid_height(const Grid *grid);
 Grid *grid_copy(const Grid *grid);
 
 /**
+ * @brief Copies a source grid into a destination grid.
+ * 
+ * @param destination The grid to be copied into.
+ * @param source The grid to be copied from.
+ * @return int Returns 1 on success, 0 if unsuccessful.
+ */
+int grid_copy_into(Grid *destination, const Grid *source);
+
+/**
  * @brief Prints the grid to the standard output.
  * 
  * @param grid The grid to be printed.
@@ -98,13 +107,21 @@ Grid *grid_copy(const Grid *grid);
 int grid_print(const Grid *grid);
 
 /**
- * @brief Counts the number of adjacent (alive) neighbours to a cell, including diagonals.
+ * @brief Counts the number of living neighbors for a given cell in the grid.
  * 
  * @param grid 
  * @param x 
  * @param y 
- * @return The number of adjacent alive neighbours to a cell.
+ * @return The number of living neighbors (0-8) for the cell at (x, y).
  */
 int grid_count_neighbours(const Grid *grid, int x, int y);
+
+/**
+ * @brief Advances the grid by one step according to the rules of the cellular automaton.
+ * 
+ * @param grid The grid to advance.
+ * @return 1 if the operation was successful, 0 otherwise.
+ */
+int grid_step(Grid *grid);
 
 #endif /* GRID_H */

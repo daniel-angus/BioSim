@@ -134,6 +134,28 @@ Grid *grid_copy(const Grid *grid) {
     return copy;
 }
 
+int grid_copy_into(Grid *destination, const Grid *source) {
+    if (destination == NULL || source == NULL) {
+        return 0;
+    }
+
+    if (destination->width != source->width ||
+        destination->height != source->height) {
+        return 0;
+    }
+
+    size_t cell_count =
+        (size_t)source->width * (size_t)source->height;
+
+    memcpy(
+        destination->cells,
+        source->cells,
+        cell_count * sizeof *source->cells
+    );
+
+    return 1;
+}
+
 int grid_print(const Grid *grid) {
     if (grid == NULL) {
         return 0;
@@ -152,14 +174,6 @@ int grid_print(const Grid *grid) {
     return 1;
 }
 
-/**
- * @brief Counts the number of living neighbors for a given cell in the grid.
- * 
- * @param grid 
- * @param x 
- * @param y 
- * @return The number of living neighbors (0-8) for the cell at (x, y).
- */
 int grid_count_neighbours(const Grid *grid, int x, int y) {
     int count = 0;
 
@@ -182,4 +196,68 @@ int grid_count_neighbours(const Grid *grid, int x, int y) {
     }
 
     return count;
- }
+}
+
+int grid_step(Grid *grid) {
+
+    if (grid == NULL) {
+        return 0;
+    }
+
+    Grid *next = grid_create(grid_width(grid), grid_height(grid));
+
+    if (next == NULL) {
+        return 0;
+    }
+
+    for (int x = 0; x < grid_width(grid); x++) {
+        for (int y = 0; y < grid_height(grid); y++) {
+            int neighbours = grid_count_neighbours(grid, x, y);
+
+            int value;
+            if (!grid_get(grid, x, y, &value)) {
+                grid_destroy(next);
+                return 0;
+            }
+
+            if (value == 1) {
+                // ----- Processes for Living Cells -----
+
+                // Survival
+                if (neighbours == 2 || neighbours == 3) {
+                    grid_set(next, x, y, 1);
+                    continue;
+                }
+            } else {
+                // ----- Processes for Dead Cells -----
+
+                // Birth
+                if (neighbours == 3) {
+                    grid_set(next, x, y, 1);
+                    continue;
+                }
+
+                // Underpopulation
+                if (neighbours < 2) {
+                    grid_set(next, x, y, 0);
+                    continue;
+                }
+
+                // Overpopulation
+                if (neighbours > 3) {
+                    grid_set(next, x, y, 0);
+                    continue;
+                }
+            }
+        }
+    }
+    
+    if (!grid_copy_into(grid, next)) {
+        grid_destroy(next);
+        return 0;
+    }
+
+    grid_destroy(next);
+    return 1;
+
+}
