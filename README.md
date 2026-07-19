@@ -44,20 +44,26 @@ BioSim/
 
 ## Building
 
-Compile with GCC:
+BioSim uses a Makefile for building.
+
+Compile the project:
 
 ```bash
-gcc -Wall -Wextra -Werror -std=c99 \
-    main.c \
-    src/grid.c \
-    -Iinclude \
-    -o biosim\
+make
 ```
 
-Run:
+The executable will be placed in the `bin/` directory.
+
+Run the program:
 
 ```bash
-./biosim
+./bin/biosim
+```
+
+To remove build artefacts:
+
+```bash
+make clean
 ```
 
 ## Contributing

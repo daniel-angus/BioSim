@@ -7,5 +7,5 @@
 # Local notes
 instructions.txt
 
-# Compiled executable
-biosim
+# Compiled executables
+bin/
