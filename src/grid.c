@@ -231,7 +231,7 @@ int grid_step(Grid *grid) {
             } else {
                 // ----- Processes for Dead Cells -----
 
-                // Birth
+                // Bi   rth
                 if (neighbours == 3) {
                     grid_set(next, x, y, 1);
                     continue;
@@ -251,7 +251,7 @@ int grid_step(Grid *grid) {
             }
         }
     }
-    
+
     if (!grid_copy_into(grid, next)) {
         grid_destroy(next);
         return 0;
