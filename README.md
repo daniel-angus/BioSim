@@ -10,17 +10,13 @@ The project aims to provide a lightweight, modular framework for implementing gr
 
 Current functionality includes:
 
-- Dynamic grid allocation
-- Automatic memory management
-- Contiguous (flat-array) grid storage
-- Bounds validation
+- Full Generalised 2D Cellular Automata
 - Documented public API
 
 ## Roadmap
 
 Planned features include:
 
-- Grid manipulation utilities
 - Multiple biological simulation models
 - Example applications
 - Unit tests
@@ -33,10 +29,15 @@ Planned features include:
 ```
 BioSim/
 ├── include/
-│   └── grid.h
+│   ├── grid.h
+│   ├── liferule.h
+│   └── renderer.h
 ├── src/
-│   └── grid.c
+│   ├── grid.c
+│   ├── liferule.c
+│   └── renderer.c
 ├── main.c
+├── Makefile
 ├── .gitignore
 ├── LICENSE
 └── README.md
