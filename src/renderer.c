@@ -1,11 +1,20 @@
 #include <stdio.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_timer.h>
+#include <SDL3_ttf/SDL_ttf.h>
+
+static TTF_Font *font = NULL;
 
 #include "renderer.h"
 
+#define PANEL_WIDTH 300
+#define PANEL_PADDING 20
+#define BUTTON_HEIGHT 50
+#define BUTTON_WIDTH (PANEL_WIDTH - 2 * PANEL_PADDING)
+
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+
 static int cell_size = 0;
 
 int renderer_init(int width, int height, int requested_cell_size) {
@@ -18,9 +27,22 @@ int renderer_init(int width, int height, int requested_cell_size) {
         return 0;
     }
 
+    if (!TTF_Init()) {
+        fprintf(stderr, "TTF_Init failed: %s\n", SDL_GetError());
+        SDL_Quit();
+        return 0;
+    }
+
+    font = TTF_OpenFont("assets/SFNS.ttf", 20);
+
+    if (font == NULL) {
+        fprintf(stderr, "TTF_OpenFont failed: %s\n", SDL_GetError());
+        return 0;
+    }
+
     if (!SDL_CreateWindowAndRenderer(
-            "BioSim — Game of Life",
-            width,
+            "BioSim — 2D Cellular Automata",
+            (width + PANEL_WIDTH),
             height,
             0,
             &window,
@@ -34,6 +56,94 @@ int renderer_init(int width, int height, int requested_cell_size) {
     }
 
     cell_size = requested_cell_size;
+    return 1;
+}
+
+static int draw_text(const char *text, float x, float y, SDL_Color colour) {
+    SDL_Surface *surface =
+        TTF_RenderText_Blended(font, text, 0, colour);
+
+    if (surface == NULL) {
+        fprintf(
+            stderr,
+            "TTF_RenderText_Blended failed: %s\n",
+            SDL_GetError()
+        );
+        return 0;
+    }
+
+    SDL_Texture *texture =
+        SDL_CreateTextureFromSurface(renderer, surface);
+
+    if (texture == NULL) {
+        fprintf(
+            stderr,
+            "SDL_CreateTextureFromSurface failed: %s\n",
+            SDL_GetError()
+        );
+        SDL_DestroySurface(surface);
+        return 0;
+    }
+
+    SDL_FRect destination = {
+        .x = x,
+        .y = y,
+        .w = (float)surface->w,
+        .h = (float)surface->h
+    };
+
+    SDL_DestroySurface(surface);
+
+    if (!SDL_RenderTexture(
+            renderer,
+            texture,
+            NULL,
+            &destination)) {
+        SDL_DestroyTexture(texture);
+        return 0;
+    }
+
+    SDL_DestroyTexture(texture);
+    return 1;
+}
+
+static int draw_control_panel(int window_width, int window_height) {
+
+    SDL_FRect panel = {
+        .x = (float)window_width,
+        .y = 0.0f,
+        .w = (float)PANEL_WIDTH,
+        .h = (float)window_height
+    };
+
+    SDL_SetRenderDrawColor(renderer, 35, 35, 35, 255);
+    SDL_RenderFillRect(renderer, &panel);
+
+    SDL_FRect conway_button = {
+    .x = (float)(window_width + PANEL_PADDING),
+    .y = (float)PANEL_PADDING,
+    .w = (float)BUTTON_WIDTH,
+    .h = (float)BUTTON_HEIGHT
+};
+
+    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+    SDL_RenderFillRect(renderer, &conway_button);
+
+    SDL_Color white = {
+        .r = 255,
+        .g = 255,
+        .b = 255,
+        .a = 255
+    };
+
+    if (!draw_text(
+            "Conway's Game of Life",
+            (float)(window_width + PANEL_PADDING + 15),
+            (float)(PANEL_PADDING + 13),
+            white)) {
+        return 0;
+    }
+
     return 1;
 }
 
@@ -172,13 +282,30 @@ int renderer_draw(const Grid *grid) {
         }
     }
 
+    if (!draw_control_panel(width_pixels, height_pixels)) {
+        return 0;
+    }
+
     SDL_RenderPresent(renderer);
     return 1;
 }
 
 void renderer_shutdown(void) {
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
+    if (font != NULL) {
+        TTF_CloseFont(font);
+        font = NULL;
+    }
+    TTF_Quit();
+
+    if (renderer != NULL) {
+        SDL_DestroyRenderer(renderer);
+        renderer = NULL;
+    }
+
+    if (window != NULL) {
+        SDL_DestroyWindow(window);
+        window = NULL;
+    }
 
     renderer = NULL;
     window = NULL;
