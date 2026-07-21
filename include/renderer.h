@@ -9,7 +9,7 @@ typedef enum {
     RENDERER_EVENT_NONE,
     RENDERER_EVENT_STEP,
     RENDERER_EVENT_TOGGLE_PLAY,
-    RENDERER_EVENT_TOGGLE_CELL
+    RENDERER_EVENT_CLICK
 } RendererEventType;
 
 typedef struct {

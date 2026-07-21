@@ -53,7 +53,6 @@ RendererEvent renderer_handle_events() {
     while (SDL_PollEvent(&event)) {
         // shutdown event
         if (event.type == SDL_EVENT_QUIT) {
-            renderer_shutdown();
             return make_event(RENDERER_EVENT_QUIT);
         }
 
@@ -61,12 +60,12 @@ RendererEvent renderer_handle_events() {
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
             event.button.button == SDL_BUTTON_LEFT) {
 
-            int grid_x = (int)(event.button.x / cell_size);
-            int grid_y = (int)(event.button.y / cell_size);
+            int clicked_x = (int)(event.button.x / cell_size);
+            int clicked_y = (int)(event.button.y / cell_size);
 
-            RendererEvent clickEvent = make_event(RENDERER_EVENT_TOGGLE_CELL);
-            clickEvent.x = grid_x;
-            clickEvent.y = grid_y;
+            RendererEvent clickEvent = make_event(RENDERER_EVENT_CLICK);
+            clickEvent.x = clicked_x;
+            clickEvent.y = clicked_y;
             return clickEvent;
         }
 

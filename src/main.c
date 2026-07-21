@@ -53,6 +53,7 @@ int main(void) {
     const int grid_width_cells = 100;
     const int grid_height_cells = 100;
     const int cell_size = 8;
+    const int FPS = 20;
 
     Grid *grid = grid_create(
         grid_width_cells,
@@ -107,7 +108,7 @@ int main(void) {
                 playing = !playing;
                 break;
             }
-            case RENDERER_EVENT_TOGGLE_CELL: {
+            case RENDERER_EVENT_CLICK: {
                 int value;
 
                 if (grid_get(grid, event.x, event.y, &value)) {
@@ -135,7 +136,8 @@ int main(void) {
             break;
         }
 
-        renderer_delay(20);
+        unsigned int frame_delay = 1000 / FPS;
+        renderer_delay(frame_delay);
     }
 
     printf("%d\n", grid_count_neighbours(grid, 1, 1));
