@@ -198,9 +198,9 @@ int grid_count_neighbours(const Grid *grid, int x, int y) {
     return count;
 }
 
-int grid_step(Grid *grid) {
+int grid_step(Grid *grid, const LifeRule *rule) {
 
-    if (grid == NULL) {
+    if (grid == NULL || rule == NULL) {
         return 0;
     }
 
@@ -213,41 +213,23 @@ int grid_step(Grid *grid) {
     for (int x = 0; x < grid_width(grid); x++) {
         for (int y = 0; y < grid_height(grid); y++) {
             int neighbours = grid_count_neighbours(grid, x, y);
+            int current_value;
+            int next_value;
 
-            int value;
-            if (!grid_get(grid, x, y, &value)) {
+            if (!grid_get(grid, x, y, &current_value)) {
                 grid_destroy(next);
                 return 0;
             }
 
-            if (value == 1) {
-                // ----- Processes for Living Cells -----
-
-                // Survival
-                if (neighbours == 2 || neighbours == 3) {
-                    grid_set(next, x, y, 1);
-                    continue;
-                }
+            if (current_value != 0) {
+                next_value = rule->survive[neighbours];
             } else {
-                // ----- Processes for Dead Cells -----
+                next_value = rule->birth[neighbours];
+            }
 
-                // Birth
-                if (neighbours == 3) {
-                    grid_set(next, x, y, 1);
-                    continue;
-                }
-
-                // Underpopulation
-                if (neighbours < 2) {
-                    grid_set(next, x, y, 0);
-                    continue;
-                }
-
-                // Overpopulation
-                if (neighbours > 3) {
-                    grid_set(next, x, y, 0);
-                    continue;
-                }
+            if (!grid_set(next, x, y, next_value)) {
+                grid_destroy(next);
+                return 0;
             }
         }
     }

@@ -1,6 +1,7 @@
 #ifndef GRID_H
-
 #define GRID_H
+
+#include "liferule.h"
 
 /**
  * @file grid.h
@@ -122,6 +123,6 @@ int grid_count_neighbours(const Grid *grid, int x, int y);
  * @param grid The grid to advance.
  * @return 1 if the operation was successful, 0 otherwise.
  */
-int grid_step(Grid *grid);
+int grid_step(Grid *grid, const LifeRule *rule);
 
 #endif /* GRID_H */

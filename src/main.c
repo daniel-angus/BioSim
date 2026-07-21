@@ -47,6 +47,7 @@
 #include <stdbool.h>
 
 #include "grid.h"
+#include "liferule.h"
 #include "renderer.h"
 
 int main(void) {
@@ -65,6 +66,17 @@ int main(void) {
         return 1;
     }
 
+    LifeRule rule;
+
+    printf("Parsing rule...\n");
+    if (!rule_parse("B3/S45678", &rule)) {
+        fprintf(stderr, "Failed to parse life rule.\n");
+        renderer_shutdown();
+        grid_destroy(grid);
+        return 1;
+    }
+    printf("Rule parsed successfully.\n");
+
     /*
      * A simple glider.
      */
@@ -74,13 +86,16 @@ int main(void) {
     grid_set(grid, 51, 52, 1);
     grid_set(grid, 52, 52, 1);
 
+    printf("Initialising renderer...\n");
     if (!renderer_init(
             grid_width_cells * cell_size,
             grid_height_cells * cell_size,
             cell_size)) {
+        fprintf(stderr, "Renderer initialisation failed.\n");
         grid_destroy(grid);
         return 1;
     }
+    printf("Renderer initialised successfully.\n");
 
     bool quit = false;
     bool playing = false;
@@ -92,14 +107,14 @@ int main(void) {
         switch (event.type) {
             case RENDERER_EVENT_FAIL: {
                 quit = true;
-                fprintf(stderr, "Failed to render event\n");
+                fprintf(stderr, "Failed to render event.\n");
             }
             case RENDERER_EVENT_QUIT: {
                 quit = true;
                 break;
             }
             case RENDERER_EVENT_STEP: {
-                if (!grid_step(grid)) {
+                if (!grid_step(grid, &rule)) {
                     quit = true;
                 }
                 break;
@@ -127,7 +142,7 @@ int main(void) {
         }
 
         if (playing) {
-            if (!grid_step(grid)) {
+            if (!grid_step(grid, &rule)) {
                 break;
             }
         }
@@ -140,10 +155,9 @@ int main(void) {
         renderer_delay(frame_delay);
     }
 
-    printf("%d\n", grid_count_neighbours(grid, 1, 1));
-
     renderer_shutdown();
     grid_destroy(grid);
+    printf("Renderer closed successfully.\n");
 
     return 0;
 }
