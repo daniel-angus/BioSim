@@ -44,6 +44,7 @@
  */
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "grid.h"
 #include "renderer.h"
@@ -80,12 +81,61 @@ int main(void) {
         return 1;
     }
 
-    while (!renderer_handle_events(grid)) {
-        if (!renderer_draw(grid)) {
+    bool quit = false;
+    bool playing = false;
+
+
+    while (!quit) {
+        RendererEvent event = renderer_handle_events();
+
+        switch (event.type) {
+            case RENDERER_EVENT_FAIL: {
+                quit = true;
+                fprintf(stderr, "Failed to render event\n");
+            }
+            case RENDERER_EVENT_QUIT: {
+                quit = true;
+                break;
+            }
+            case RENDERER_EVENT_STEP: {
+                if (!grid_step(grid)) {
+                    quit = true;
+                }
+                break;
+            }
+            case RENDERER_EVENT_TOGGLE_PLAY: {
+                playing = !playing;
+                break;
+            }
+            case RENDERER_EVENT_TOGGLE_CELL: {
+                int value;
+
+                if (grid_get(grid, event.x, event.y, &value)) {
+                    if (!grid_set(grid, event.x, event.y, !value)) {
+                        quit = true;
+                    }
+                }
+            }
+            case RENDERER_EVENT_NONE: {
+                break;
+            }
+        }
+
+        if (quit) {
             break;
         }
 
-        renderer_delay(16);
+        if (playing) {
+            if (!grid_step(grid)) {
+                break;
+            }
+        }
+
+         if (!renderer_draw(grid)) {
+            break;
+        }
+
+        renderer_delay(20);
     }
 
     printf("%d\n", grid_count_neighbours(grid, 1, 1));

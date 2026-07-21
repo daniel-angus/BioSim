@@ -37,39 +37,57 @@ int renderer_init(int width, int height, int requested_cell_size) {
     return 1;
 }
 
-int renderer_handle_events(Grid *grid) {
-    if (grid == NULL) {
-        return 1;
-    }
+static RendererEvent make_event(RendererEventType type) {
+    return (RendererEvent) {
+        .type = type,
+        // sentinel values
+        .x = -1,
+        .y = -1
+    };
+}
+
+RendererEvent renderer_handle_events() {
 
     SDL_Event event;
 
     while (SDL_PollEvent(&event)) {
+        // shutdown event
         if (event.type == SDL_EVENT_QUIT) {
-            return 1;
+            renderer_shutdown();
+            return make_event(RENDERER_EVENT_QUIT);
         }
 
+        // click event
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
             event.button.button == SDL_BUTTON_LEFT) {
 
             int grid_x = (int)(event.button.x / cell_size);
             int grid_y = (int)(event.button.y / cell_size);
 
-            int value;
-
-            if (grid_get(grid, grid_x, grid_y, &value)) {
-                grid_set(grid, grid_x, grid_y, !value);
-            }
+            RendererEvent clickEvent = make_event(RENDERER_EVENT_TOGGLE_CELL);
+            clickEvent.x = grid_x;
+            clickEvent.y = grid_y;
+            return clickEvent;
         }
 
+        // step event
+        if (event.type == SDL_EVENT_KEY_DOWN &&
+            event.key.key == SDLK_S &&
+            !event.key.repeat) {
+            return make_event(RENDERER_EVENT_STEP);
+        }
+
+        // play/pause event
         if (event.type == SDL_EVENT_KEY_DOWN &&
             event.key.key == SDLK_SPACE &&
             !event.key.repeat) {
-            grid_step(grid);
+            return make_event(RENDERER_EVENT_TOGGLE_PLAY);
         }
+
+        // other events go here
     }
 
-    return 0;
+    return make_event(RENDERER_EVENT_NONE);
 }
 
 void renderer_delay(unsigned int milliseconds) {
