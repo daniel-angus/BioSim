@@ -16,6 +16,8 @@ static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 
 static int cell_size = 0;
+static int grid_pixel_width = 0;
+static int grid_pixel_height = 0;
 
 int renderer_init(int width, int height, int requested_cell_size) {
     if (width <= 0 || height <= 0 || requested_cell_size <= 0) {
@@ -39,6 +41,9 @@ int renderer_init(int width, int height, int requested_cell_size) {
         fprintf(stderr, "TTF_OpenFont failed: %s\n", SDL_GetError());
         return 0;
     }
+
+    grid_pixel_width = width;
+    grid_pixel_height = height;
 
     if (!SDL_CreateWindowAndRenderer(
             "BioSim — 2D Cellular Automata",
@@ -170,13 +175,35 @@ RendererEvent renderer_handle_events() {
         if (event.type == SDL_EVENT_MOUSE_BUTTON_DOWN &&
             event.button.button == SDL_BUTTON_LEFT) {
 
-            int clicked_x = (int)(event.button.x / cell_size);
-            int clicked_y = (int)(event.button.y / cell_size);
+            int mouse_x = (int)event.button.x;
+            int mouse_y = (int)event.button.y;
 
-            RendererEvent clickEvent = make_event(RENDERER_EVENT_CLICK);
-            clickEvent.x = clicked_x;
-            clickEvent.y = clicked_y;
-            return clickEvent;
+            int button_x = grid_pixel_width + PANEL_PADDING;
+            int button_y = PANEL_PADDING;
+
+            // Conway button
+            if (mouse_x >= button_x &&
+                mouse_x < button_x + BUTTON_WIDTH &&
+                mouse_y >= button_y &&
+                mouse_y < button_y + BUTTON_HEIGHT) {
+
+                return make_event(RENDERER_EVENT_RULE_CONWAY);
+            }
+
+            // Grid click
+            if (mouse_x >= 0 &&
+                mouse_x < grid_pixel_width &&
+                mouse_y >= 0 &&
+                mouse_y < grid_pixel_height) {
+
+                RendererEvent click_event =
+                    make_event(RENDERER_EVENT_CLICK);
+
+                click_event.x = mouse_x / cell_size;
+                click_event.y = mouse_y / cell_size;
+
+                return click_event;
+            }
         }
 
         // step event

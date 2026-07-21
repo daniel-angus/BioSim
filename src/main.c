@@ -132,6 +132,13 @@ int main(void) {
                     }
                 }
             }
+            case RENDERER_EVENT_RULE_CONWAY: {
+                if (!rule_parse("B3/S23", &rule)) {
+                    fprintf(stderr, "Failed to apply Conway rule\n");
+                    quit = true;
+                }
+    break;
+            }
             case RENDERER_EVENT_NONE: {
                 break;
             }
