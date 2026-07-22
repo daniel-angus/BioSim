@@ -69,7 +69,7 @@ int main(void) {
     LifeRule rule;
 
     printf("Parsing rule...\n");
-    if (!rule_parse("B3/S45678", &rule)) {
+    if (!rule_parse("B3/S23", &rule)) {
         fprintf(stderr, "Failed to parse life rule.\n");
         renderer_shutdown();
         grid_destroy(grid);
@@ -133,11 +133,20 @@ int main(void) {
                 }
             }
             case RENDERER_EVENT_RULE_CONWAY: {
-                if (!rule_parse("B3/S23", &rule)) {
-                    fprintf(stderr, "Failed to apply Conway rule\n");
-                    quit = true;
-                }
-    break;
+                rule_parse("B3/S23", &rule);
+                break;
+            }
+            case RENDERER_EVENT_RULE_HIGHLIFE: {
+                rule_parse("B36/S23", &rule);
+                break;
+            }
+            case RENDERER_EVENT_RULE_SEEDS: {
+                rule_parse("B2/S", &rule);
+                break;
+            }
+            case RENDERER_EVENT_RULE_DAYNIGHT: {
+                rule_parse("B3678/S34678", &rule);
+                break;
             }
             case RENDERER_EVENT_NONE: {
                 break;

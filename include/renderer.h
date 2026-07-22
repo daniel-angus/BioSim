@@ -1,6 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <SDL3/SDL.h>
+
 #include "grid.h"
 
 typedef enum {
@@ -10,7 +12,10 @@ typedef enum {
     RENDERER_EVENT_STEP,
     RENDERER_EVENT_TOGGLE_PLAY,
     RENDERER_EVENT_CLICK,
-    RENDERER_EVENT_RULE_CONWAY
+    RENDERER_EVENT_RULE_CONWAY,
+    RENDERER_EVENT_RULE_HIGHLIFE,
+    RENDERER_EVENT_RULE_SEEDS,
+    RENDERER_EVENT_RULE_DAYNIGHT
 } RendererEventType;
 
 typedef struct {
@@ -19,6 +24,16 @@ typedef struct {
     int y;
     // other values for events here (event handler needs sentinels)
 } RendererEvent;
+
+typedef struct {
+    SDL_FRect rect;
+    const char *text;
+    bool selected;
+    RendererEventType event;
+} Button;
+
+#define BUTTON_COUNT ((int)(sizeof buttons / sizeof buttons[0]))
+#define BUTTON_GAP 10
 
 void renderer_delay(unsigned int milliseconds);
 

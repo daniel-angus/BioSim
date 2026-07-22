@@ -1,9 +1,8 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_timer.h>
 #include <SDL3_ttf/SDL_ttf.h>
-
-static TTF_Font *font = NULL;
 
 #include "renderer.h"
 
@@ -11,13 +10,36 @@ static TTF_Font *font = NULL;
 #define PANEL_PADDING 20
 #define BUTTON_HEIGHT 50
 #define BUTTON_WIDTH (PANEL_WIDTH - 2 * PANEL_PADDING)
+#define BUTTON_GAP 10
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
+static TTF_Font *font = NULL;
 
 static int cell_size = 0;
 static int grid_pixel_width = 0;
 static int grid_pixel_height = 0;
+
+static Button buttons[] = {
+    {
+        .text = "Conway",
+        .selected = true,
+        .event = RENDERER_EVENT_RULE_CONWAY
+    },
+    {
+        .text = "HighLife",
+        .event = RENDERER_EVENT_RULE_HIGHLIFE
+    },
+    {
+        .text = "Seeds",
+        .event = RENDERER_EVENT_RULE_SEEDS
+    },
+    {
+        .text = "Day & Night",
+        .event = RENDERER_EVENT_RULE_DAYNIGHT
+    }
+};
+#define BUTTON_COUNT ((int)(sizeof buttons / sizeof buttons[0])) 
 
 int renderer_init(int width, int height, int requested_cell_size) {
     if (width <= 0 || height <= 0 || requested_cell_size <= 0) {
@@ -61,6 +83,15 @@ int renderer_init(int width, int height, int requested_cell_size) {
     }
 
     cell_size = requested_cell_size;
+
+    for (int i = 0; i < BUTTON_COUNT; ++i) {
+        buttons[i].rect = (SDL_FRect) {
+            .x = (float)(width + PANEL_PADDING),
+            .y = (float)(PANEL_PADDING + i * (BUTTON_HEIGHT + BUTTON_GAP)),
+            .w = (float)BUTTON_WIDTH,
+            .h = (float)BUTTON_HEIGHT
+        };
+    }
     return 1;
 }
 
@@ -124,16 +155,6 @@ static int draw_control_panel(int window_width, int window_height) {
     SDL_SetRenderDrawColor(renderer, 35, 35, 35, 255);
     SDL_RenderFillRect(renderer, &panel);
 
-    SDL_FRect conway_button = {
-    .x = (float)(window_width + PANEL_PADDING),
-    .y = (float)PANEL_PADDING,
-    .w = (float)BUTTON_WIDTH,
-    .h = (float)BUTTON_HEIGHT
-};
-
-    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-    SDL_RenderFillRect(renderer, &conway_button);
-
     SDL_Color white = {
         .r = 255,
         .g = 255,
@@ -141,12 +162,24 @@ static int draw_control_panel(int window_width, int window_height) {
         .a = 255
     };
 
-    if (!draw_text(
-            "Conway's Game of Life",
-            (float)(window_width + PANEL_PADDING + 15),
-            (float)(PANEL_PADDING + 13),
-            white)) {
-        return 0;
+    for (int i = 0; i < BUTTON_COUNT; ++i) {
+        if (buttons[i].selected) {
+            SDL_SetRenderDrawColor(renderer, 70, 120, 255, 255);
+        } else {
+            SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
+        }
+
+        if (!SDL_RenderFillRect(renderer, &buttons[i].rect)) {
+            return 0;
+        }
+
+        if (!draw_text(
+                buttons[i].text,
+                buttons[i].rect.x + 15.0f,
+                buttons[i].rect.y + 13.0f,
+                white)) {
+            return 0;
+        }
     }
 
     return 1;
@@ -159,6 +192,13 @@ static RendererEvent make_event(RendererEventType type) {
         .x = -1,
         .y = -1
     };
+}
+
+static bool point_in_rect(int x, int y, const SDL_FRect *rect) {
+    return x >= rect->x &&
+           x < rect->x + rect->w &&
+           y >= rect->y &&
+           y < rect->y + rect->h;
 }
 
 RendererEvent renderer_handle_events() {
@@ -178,16 +218,17 @@ RendererEvent renderer_handle_events() {
             int mouse_x = (int)event.button.x;
             int mouse_y = (int)event.button.y;
 
-            int button_x = grid_pixel_width + PANEL_PADDING;
-            int button_y = PANEL_PADDING;
+            // control buttons
+            for (int i = 0; i < BUTTON_COUNT; ++i) {
+                if (point_in_rect(mouse_x, mouse_y, &buttons[i].rect)) {
+                    for (int j = 0; j < BUTTON_COUNT; ++j) {
+                        buttons[j].selected = false;
+                    }
 
-            // Conway button
-            if (mouse_x >= button_x &&
-                mouse_x < button_x + BUTTON_WIDTH &&
-                mouse_y >= button_y &&
-                mouse_y < button_y + BUTTON_HEIGHT) {
+                    buttons[i].selected = true;
 
-                return make_event(RENDERER_EVENT_RULE_CONWAY);
+                    return make_event(buttons[i].event);
+                }
             }
 
             // Grid click
@@ -196,8 +237,7 @@ RendererEvent renderer_handle_events() {
                 mouse_y >= 0 &&
                 mouse_y < grid_pixel_height) {
 
-                RendererEvent click_event =
-                    make_event(RENDERER_EVENT_CLICK);
+                RendererEvent click_event = make_event(RENDERER_EVENT_CLICK);
 
                 click_event.x = mouse_x / cell_size;
                 click_event.y = mouse_y / cell_size;
