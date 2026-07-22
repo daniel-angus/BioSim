@@ -68,7 +68,7 @@ int grid_set(Grid *grid, int x, int y, int value) {
     grid->cells[grid_index(grid, x, y)] = value;
     return 1;
 }
-
+    
 int grid_get(const Grid *grid, int x, int y, int *value) {
     if (grid == NULL || x < 0 || x >= grid->width || y < 0 || y >= grid->height || value == NULL) {
         return 0;

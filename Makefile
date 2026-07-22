@@ -1,9 +1,8 @@
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -std=c99 \
-          $(shell pkg-config --cflags sdl3 sdl3-ttf)
-
-LDFLAGS = $(shell pkg-config --libs sdl3 sdl3-ttf)
+CPPFLAGS = -Iinclude $(shell pkg-config --cflags sdl3 sdl3-ttf)
+CFLAGS   = -Wall -Wextra -Werror -std=c17
+LDLIBS   = $(shell pkg-config --libs sdl3 sdl3-ttf)
 
 INCLUDES = -Iinclude
 
@@ -14,7 +13,7 @@ all: $(TARGET)
 
 $(TARGET): $(SRC)
 	mkdir -p bin
-	$(CC) $(CFLAGS) $(INCLUDES) $(SRC) -o $(TARGET) $(LDFLAGS)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(SRC) -o $@ $(LDLIBS)
 
 clean:
 	rm -rf bin
