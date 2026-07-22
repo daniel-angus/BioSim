@@ -29,7 +29,6 @@ Planned features include:
 ```structure
 BioSim/
 ├── assets/
-│   └── SFNS.ttf
 ├── include/
 │   ├── grid.h
 │   ├── liferule.h
