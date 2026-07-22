@@ -26,7 +26,7 @@ Planned features include:
 
 ## Project Structure
 
-```
+```structure
 BioSim/
 ├── include/
 │   ├── grid.h
