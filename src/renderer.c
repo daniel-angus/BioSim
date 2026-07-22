@@ -20,23 +20,30 @@ static int cell_size = 0;
 static int grid_pixel_width = 0;
 static int grid_pixel_height = 0;
 
+typedef struct {
+    SDL_FRect rect;
+    const char *text;
+    bool selected;
+    RendererEventType event;
+} Button;
+
 static Button buttons[] = {
     {
-        .text = "Conway",
+        .text = "Conway (B3/S23)",
         .selected = true,
         .event = RENDERER_EVENT_RULE_CONWAY
     },
     {
-        .text = "HighLife",
+        .text = "HighLife (B36/S23)",
         .event = RENDERER_EVENT_RULE_HIGHLIFE
     },
     {
-        .text = "Seeds",
+        .text = "Seeds (B2/S)",
         .event = RENDERER_EVENT_RULE_SEEDS
     },
     {
-        .text = "Day & Night",
-        .event = RENDERER_EVENT_RULE_DAYNIGHT
+        .text = "Coral (B3/S45678)",
+        .event = RENDERER_EVENT_RULE_CORAL
     }
 };
 #define BUTTON_COUNT ((int)(sizeof buttons / sizeof buttons[0])) 
@@ -64,8 +71,10 @@ int renderer_init(int width, int height, int requested_cell_size) {
         return 0;
     }
 
+    // file level variable assignment
     grid_pixel_width = width;
     grid_pixel_height = height;
+    cell_size = requested_cell_size;
 
     if (!SDL_CreateWindowAndRenderer(
             "BioSim — 2D Cellular Automata",
@@ -77,12 +86,12 @@ int renderer_init(int width, int height, int requested_cell_size) {
         fprintf(stderr,
                 "SDL_CreateWindowAndRenderer failed: %s\n",
                 SDL_GetError());
-
+        
+        TTF_CloseFont(font);
+        TTF_Quit();
         SDL_Quit();
         return 0;
     }
-
-    cell_size = requested_cell_size;
 
     for (int i = 0; i < BUTTON_COUNT; ++i) {
         buttons[i].rect = (SDL_FRect) {
@@ -218,20 +227,24 @@ RendererEvent renderer_handle_events() {
             int mouse_x = (int)event.button.x;
             int mouse_y = (int)event.button.y;
 
-            // control buttons
-            for (int i = 0; i < BUTTON_COUNT; ++i) {
-                if (point_in_rect(mouse_x, mouse_y, &buttons[i].rect)) {
-                    for (int j = 0; j < BUTTON_COUNT; ++j) {
-                        buttons[j].selected = false;
+            /* Panel clicks only */
+            if (mouse_x >= grid_pixel_width) {
+                for (int i = 0; i < BUTTON_COUNT; ++i) {
+                    if (point_in_rect(mouse_x, mouse_y, &buttons[i].rect)) {
+                        for (int j = 0; j < BUTTON_COUNT; ++j) {
+                            buttons[j].selected = false;
+                        }
+
+                        buttons[i].selected = true;
+
+                        return make_event(buttons[i].event);
                     }
-
-                    buttons[i].selected = true;
-
-                    return make_event(buttons[i].event);
                 }
+
+                return make_event(RENDERER_EVENT_NONE);
             }
 
-            // Grid click
+            /* Grid clicks only */
             if (mouse_x >= 0 &&
                 mouse_x < grid_pixel_width &&
                 mouse_y >= 0 &&
@@ -374,8 +387,6 @@ void renderer_shutdown(void) {
         window = NULL;
     }
 
-    renderer = NULL;
-    window = NULL;
     cell_size = 0;
 
     SDL_Quit();

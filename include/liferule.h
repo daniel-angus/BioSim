@@ -8,8 +8,6 @@ typedef struct {
     bool survive[9];
 } LifeRule;
 
-LifeRule rule_conway(void);
-
 int rule_parse(const char *notation, LifeRule *rule);
 
 #endif

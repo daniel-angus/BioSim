@@ -74,11 +74,6 @@ int grid_get(const Grid *grid, int x, int y, int *value) {
         return 0;
     }
 
-    if (x < 0 || x >= grid->width ||
-        y < 0 || y >= grid->height) {
-        return 0;
-    }
-
     *value = grid->cells[grid_index(grid, x, y)];
     return 1;
 }

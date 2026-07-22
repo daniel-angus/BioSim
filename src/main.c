@@ -100,14 +100,15 @@ int main(void) {
     bool quit = false;
     bool playing = false;
 
-
     while (!quit) {
         RendererEvent event = renderer_handle_events();
+
 
         switch (event.type) {
             case RENDERER_EVENT_FAIL: {
                 quit = true;
                 fprintf(stderr, "Failed to render event.\n");
+                break;
             }
             case RENDERER_EVENT_QUIT: {
                 quit = true;
@@ -131,21 +132,30 @@ int main(void) {
                         quit = true;
                     }
                 }
+                break;
             }
             case RENDERER_EVENT_RULE_CONWAY: {
-                rule_parse("B3/S23", &rule);
+                if (!rule_parse("B3/S23", &rule)) {
+                    quit = true;
+                }
                 break;
             }
             case RENDERER_EVENT_RULE_HIGHLIFE: {
-                rule_parse("B36/S23", &rule);
+                if (!rule_parse("B36/S23", &rule)) {
+                    quit = true;
+                }
                 break;
             }
             case RENDERER_EVENT_RULE_SEEDS: {
-                rule_parse("B2/S", &rule);
+                if (!rule_parse("B2/S", &rule)) {
+                    quit = true;
+                }
                 break;
             }
-            case RENDERER_EVENT_RULE_DAYNIGHT: {
-                rule_parse("B3678/S34678", &rule);
+            case RENDERER_EVENT_RULE_CORAL: {
+                if (!rule_parse("B3/S45678", &rule)) {
+                    quit = true;
+                }
                 break;
             }
             case RENDERER_EVENT_NONE: {

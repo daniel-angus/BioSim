@@ -1,16 +1,6 @@
 #include <string.h>
 #include "liferule.h"
 
-LifeRule rule_conway(void) {
-    LifeRule rule = {0};
-
-    rule.birth[3] = true;
-    rule.survive[2] = true;
-    rule.survive[3] = true;
-
-    return rule;
-}
-
 int rule_parse(const char *notation, LifeRule *rule) {
     if (notation == NULL || rule == NULL) {
         return 0;
