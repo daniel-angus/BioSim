@@ -28,18 +28,20 @@ Planned features include:
 
 ```structure
 BioSim/
+├── assets/
+│   └── SFNS.ttf
 ├── include/
 │   ├── grid.h
 │   ├── liferule.h
 │   └── renderer.h
 ├── src/
+│   ├── main.c
 │   ├── grid.c
 │   ├── liferule.c
 │   └── renderer.c
-├── main.c
-├── Makefile
 ├── .gitignore
 ├── LICENSE
+├── Makefile
 └── README.md
 ```
 
